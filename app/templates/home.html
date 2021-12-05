@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <ul>
+        {% for m2c in member.m2c_list %}
+            <li>{{ m2c.club.name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <ul>
+        {% for event in events %}
+            <li><b>{{ event.name }}</b> takes place at <b>{{ event.dateTime }}</b> on
+                <b>{{ event.address }}</b></li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
