@@ -11,8 +11,8 @@ class Member(UserMixin, db.Model):
 	password = db.Column(db.String(64))
 	major = db.Column(db.String(64))
 	year = db.Column(db.Integer)
-	m2e_list = db.relationship("MemberToEvent", backref="Member", lazy="dynamic")
-	m2c_list = db.relationship("MemberToClub", backref="Member", lazy="dynamic")
+	m2e_list = db.relationship("MemberToEvent", backref="member", lazy="dynamic")
+	m2c_list = db.relationship("MemberToClub", backref="member", lazy="dynamic")
 
 	def set_password(self, password):
 		self.password = generate_password_hash(password)
@@ -29,7 +29,7 @@ class Club(db.Model):
 	id = db.Column(db.Integer, primary_key = True)
 	name = db.Column(db.String(64), index = True, unique = True)
 	description = db.Column(db.String(1024))
-	m2c_list = db.relationship("MemberToClub", backref="Club", lazy="dynamic")
+	m2c_list = db.relationship("MemberToClub", backref="club", lazy="dynamic")
 
 
 class Event(db.Model):
@@ -39,7 +39,7 @@ class Event(db.Model):
 	address = db.Column(db.String(128), index = True)
 	description = db.Column(db.String(1024))
 	clubID = db.Column(db.Integer, db.ForeignKey('club.id'))
-	m2e_list = db.relationship("MemberToEvent", backref="Event", lazy="dynamic")
+	m2e_list = db.relationship("MemberToEvent", backref="event", lazy="dynamic")
 
 
 class MemberToClub(db.Model):

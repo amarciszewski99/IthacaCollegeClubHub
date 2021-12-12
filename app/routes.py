@@ -11,8 +11,8 @@ from app.models import Member, Club, Event, MemberToClub, MemberToEvent
 @app.route('/home')
 @login_required
 def home():
-    my_clubs = Member.query.join("MemberToClub").join("Club").filter_by(email=current_user.email).all()
-    return render_template('home.html', my_clubs=my_clubs)
+    member = Member.query.filter_by(email=current_user.email).first()
+    return render_template('home.html', member=member)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -64,10 +64,20 @@ def clubs():
 @login_required
 def club(name):
     form = JoinClubForm()
+
     currentClub = Club.query.filter_by(name=name).first()
-    #memberList = db.session.query(Member).all()
-    #for thisMember in memberList:
-        #if
+    isMember = MemberToClub.query.filter_by(memberID=current_user.id, clubID=currentClub.id).first()
+
+    if form.validate_on_submit():
+        if isMember is None:
+            clubMember = MemberToClub(memberID=current_user.id, clubID=currentClub.id)
+            db.session.add(clubMember)
+            db.session.commit()
+            return redirect(url_for('home'))
+        else:
+            flash("You are already a registered member of this club!")
+            return render_template('club.html', title=currentClub.name, club=currentClub, form=form)
+
     return render_template('club.html', title=currentClub.name, club=currentClub, form=form)
 
 
@@ -82,7 +92,7 @@ def event(name):
 @app.route('/my_events')
 @login_required
 def my_events():
-    events = Event.query.join("MemberToEvent").filter_by(memberID=current_user.id).all()
+    events = Member.query.join("MemberToEvent").join("Event").filter_by(id=current_user).all()
     return render_template('myEvents.html', events=events)
 
 
@@ -143,6 +153,9 @@ def resetDB():
     db.session.add(member5)
     member6 = Member(id=6, name="Member F", email="MemberF@mail.com", major="Pyrotechnics", year=2030)
     db.session.add(member6)
+    admin = Member(id=7, name="Admin", email="admin@admin.com", major="Admin", year=2020)
+    admin.set_password("1234")
+    db.session.add(admin)
 
     #Create Club objects
     club1 = Club(id=1, name="Club A", description="Club A Description")
@@ -171,6 +184,10 @@ def resetDB():
     db.session.add(MtC5)
     MtC6 = MemberToClub(id=6, memberID=6, clubID=2, is_admin=False)
     db.session.add(MtC6)
+    adminToClub1 = MemberToClub(id=7, memberID=7, clubID=1, is_admin=True)
+    db.session.add(adminToClub1)
+    adminToClub2 = MemberToClub(id=8, memberID=7, clubID=2, is_admin=False)
+    db.session.add(adminToClub2)
 
 
     #Assign MemberToEvent
@@ -186,6 +203,10 @@ def resetDB():
     db.session.add(MtE5)
     MtE6= MemberToEvent(id=6, memberID=6, eventID=2)
     db.session.add(MtE6)
+    adminToEvent1 = MemberToEvent(id=7, memberID=7, eventID=1)
+    db.session.add(adminToEvent1)
+    admintToEvent2 = MemberToEvent(id=8, memberID=7, eventID=2)
+    db.session.add(admintToEvent2)
 
     db.session.commit()
 
