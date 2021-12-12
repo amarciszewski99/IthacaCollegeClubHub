@@ -27,10 +27,10 @@ class RegisterForm(FlaskForm):
             raise ValidationError('Email Already Used')
 
 class AddEventForm(FlaskForm):
-    name = StringField('Event Field', validators=[DataRequired()])
+    name = StringField('Event Title', validators=[DataRequired()])
     club = SelectField('Hosting Club', validators=[DataRequired()])
-    date_time = DateTimeField('Event Date', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
-    location = TextAreaField('Event Location', validators=[DataRequired()])
+    date_time = DateTimeField('Date', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    location = TextAreaField('Street Address', validators=[DataRequired()])
     submit = SubmitField('Schedule Event')
 
 class AddClubForm(FlaskForm):
