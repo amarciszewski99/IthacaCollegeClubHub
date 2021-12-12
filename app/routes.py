@@ -5,8 +5,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegisterForm, AddClubForm, AddEventForm, JoinClubForm, JoinEventForm
 from app.models import Member, Club, Event, MemberToClub, MemberToEvent
-import requests
-import json, pprint
+import requests, json, pprint
 
 
 @app.route('/')
@@ -87,13 +86,19 @@ def club(name):
 def event(name):
     form = JoinEventForm()
     event = Event.query.filter_by(name=name).first()
+    club = Club.query.filter_by(id=event.clubID).first()
     isGoing = MemberToEvent.query.filter_by(memberID=current_user.id, eventID=event.id).first()
     address = event.address
-    response = requests.get("http://www.mapquestapi.com/geocoding/v1/address?key=7bq6hO3gIFAEYzROdCdmwau7CDALw4jC&location=" + address)
-    pprint(response)
-    responseDict = json.loads(response.text)[0]
-    lat = responseDict['results']['locations']['latLng']['lat']
-    lng = responseDict['results']['locations']['latLng']['lng']
+    response = requests.get("http://www.mapquestapi.com/geocoding/v1/address?key=7bq6hO3gIFAEYzROdCdmwau7CDALw4jC&location=" + address).text
+
+    print(response)
+    responseDict = json.loads(response)
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(responseDict["results"][0]["locations"][0]["latLng"])
+    pp.pprint(event.address)
+
+    lat = responseDict["results"][0]["locations"][0]["latLng"]['lat']
+    lng = responseDict["results"][0]["locations"][0]["latLng"]['lng']
 
     if form.validate_on_submit():
         if isGoing is None:
@@ -103,9 +108,9 @@ def event(name):
             return redirect(url_for('home'))
         else:
             flash("You are already RSVP'd for this event!")
-            return render_template('event.html', title=event.name, event=event, lat=lat, lng=lng, form=form)
+            return render_template('event.html', title=event.name, event=event, club=club, lat=lat, lng=lng, form=form)
 
-    return render_template('event.html', title=event.name, event=event, lat=lat, lng=lng, form=form)
+    return render_template('event.html', title=event.name, event=event, club=club, lat=lat, lng=lng, form=form)
 
 
 @app.route('/my_events')
