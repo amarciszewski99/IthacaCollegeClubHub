@@ -92,7 +92,8 @@ def event(name):
 @app.route('/my_events')
 @login_required
 def my_events():
-    events = Member.query.join(MemberToClub).join(Club).join(Event).filter_by(memberID=current_user.id).all()
+    #WHY DOES THIS WORK??? HOW DOES IT KNOW WHICH MEMBER'S CLUBS TO QUERY FROM???
+    events = Event.query.join(MemberToEvent).join(Member).all()
     return render_template('myEvents.html', events=events)
 
 
@@ -170,6 +171,9 @@ def resetDB():
     event2 = Event(id=2, name="Event B", dateTime="%2021-%02-%02 %13:%00:%00", address="456 Love Lane", \
                    description="Event B Description", clubID=2)
     db.session.add(event2)
+    event3 = Event(id=3, name="Event C", dateTime="2021-03-03 14:00:00", address="9 Pheasant Run, Holmdel, NJ, 07733",\
+                   description="Event C Description", clubID=2)
+    db.session.add(event3)
 
     #Assign MemberToClub
     MtC1 = MemberToClub(id=1, memberID=1, clubID=1, is_admin=True)
@@ -207,6 +211,8 @@ def resetDB():
     db.session.add(adminToEvent1)
     admintToEvent2 = MemberToEvent(id=8, memberID=7, eventID=2)
     db.session.add(admintToEvent2)
+    admintToEvent3 = MemberToEvent(id=9, memberID=7, eventID=3)
+    db.session.add(admintToEvent3)
 
     db.session.commit()
 
