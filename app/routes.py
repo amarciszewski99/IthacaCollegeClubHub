@@ -13,8 +13,7 @@ import json, pprint
 @app.route('/home')
 @login_required
 def home():
-    member = Member.query.filter_by(email=current_user.email).first()
-    return render_template('home.html', member=member)
+    return render_template('home.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])

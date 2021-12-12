@@ -3,7 +3,7 @@
 {% block app_content %}
     <h1>Your clubs:</h1>
     <ul>
-    {% for m2c in member.m2c_list %}
+    {% for m2c in current_user.m2c_list %}
         <li><a href="{{ url_for('club', name=m2c.club.name)}}">{{ m2c.club.name }}</a></li>
     {% endfor %}
     </ul>
