@@ -92,7 +92,7 @@ def event(name):
 @app.route('/my_events')
 @login_required
 def my_events():
-    events = Member.query.join("MemberToEvent").join("Event").filter_by(id=current_user).all()
+    events = Member.query.join(MemberToClub).join(Club).join(Event).filter_by(memberID=current_user.id).all()
     return render_template('myEvents.html', events=events)
 
 
