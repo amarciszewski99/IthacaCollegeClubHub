@@ -5,6 +5,8 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegisterForm, AddClubForm, AddEventForm, JoinClubForm, JoinEventForm
 from app.models import Member, Club, Event, MemberToClub, MemberToEvent
+import requests
+import json, pprint
 
 
 @app.route('/')
@@ -86,7 +88,25 @@ def club(name):
 def event(name):
     form = JoinEventForm()
     event = Event.query.filter_by(name=name).first()
-    return render_template('event.html', title=event.name, event=event, form=form)
+    isGoing = MemberToEvent.query.filter_by(memberID=current_user.id, eventID=event.id).first()
+    address = event.address
+    response = requests.get("http://www.mapquestapi.com/geocoding/v1/address?key=7bq6hO3gIFAEYzROdCdmwau7CDALw4jC&location=" + address)
+    pprint(response)
+    responseDict = json.loads(response.text)[0]
+    lat = responseDict['results']['locations']['latLng']['lat']
+    lng = responseDict['results']['locations']['latLng']['lng']
+
+    if form.validate_on_submit():
+        if isGoing is None:
+            eventMember = MemberToEvent(memberID=current_user.id, eventID=event.id)
+            db.session.add(eventMember)
+            db.session.commit()
+            return redirect(url_for('home'))
+        else:
+            flash("You are already RSVP'd for this event!")
+            return render_template('event.html', title=event.name, event=event, lat=lat, lng=lng, form=form)
+
+    return render_template('event.html', title=event.name, event=event, lat=lat, lng=lng, form=form)
 
 
 @app.route('/my_events')
@@ -121,7 +141,7 @@ def add_event_form():
     for thisEvent in eventList:
         if (thisEvent.name == form.name.data) and (thisEvent.dateTime == form.date_time.data):
             flash("This event already exists")
-            return redirect(url_for('add_event_form'))
+            return redirect(url_for('add_event'))
     if form.validate_on_submit():
         event = Event(name=form.name.data, dateTime=form.date_time.data)
         db.session.add(event)
@@ -165,10 +185,10 @@ def resetDB():
     db.session.add(club2)
 
     #Create Event objects
-    event1 = Event(id=1, name="Event A", dateTime="%2021-%01-%01 %12:%00:%00", address="123 Main St", \
+    event1 = Event(id=1, name="Event A", dateTime="2021-01-01 12:00:00", address="257 Pennsylvania Ave, Ithaca, NY, 14850", \
                    description="Event A Description", clubID=1)
     db.session.add(event1)
-    event2 = Event(id=2, name="Event B", dateTime="%2021-%02-%02 %13:%00:%00", address="456 Love Lane", \
+    event2 = Event(id=2, name="Event B", dateTime="2021-02-02 13:00:00", address="953 Danby road, Ithaca, NY, 14850", \
                    description="Event B Description", clubID=2)
     db.session.add(event2)
     event3 = Event(id=3, name="Event C", dateTime="2021-03-03 14:00:00", address="9 Pheasant Run, Holmdel, NJ, 07733",\
