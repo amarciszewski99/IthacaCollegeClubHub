@@ -153,11 +153,11 @@ def add_event_form():
     form.club.choices = [(c.id, c.name) for c in Club.query.all()]
     eventList = db.session.query(Event).all()
     for thisEvent in eventList:
-        if (thisEvent.name == form.name.data) and (thisEvent.dateTime == form.date_time.data):
+        if (thisEvent.name == form.name.data) and (thisEvent.date == form.date.data):
             flash("This event already exists")
             return redirect(url_for('add_event'))
     if form.validate_on_submit():
-        event = Event(name=form.name.data, dateTime=form.date_time.data)
+        event = Event(name=form.name.data, date=form.date.data, address=form.location.data, description=form.description.data, clubID=form.club.data)
         db.session.add(event)
         db.session.commit()
         flash('New event added: {}'.format(form.name.data))
@@ -199,13 +199,13 @@ def resetDB():
     db.session.add(club2)
 
     #Create Event objects
-    event1 = Event(id=1, name="Event A", dateTime="2021-01-01 12:00:00", address="257 Pennsylvania Ave, Ithaca, NY, 14850", \
+    event1 = Event(id=1, name="Event A", date="2021-01-01", address="257 Pennsylvania Ave, Ithaca, NY, 14850", \
                    description="Event A Description", clubID=1)
     db.session.add(event1)
-    event2 = Event(id=2, name="Event B", dateTime="2021-02-02 13:00:00", address="953 Danby road, Ithaca, NY, 14850", \
+    event2 = Event(id=2, name="Event B", date="2021-02-02", address="953 Danby road, Ithaca, NY, 14850", \
                    description="Event B Description", clubID=2)
     db.session.add(event2)
-    event3 = Event(id=3, name="Event C", dateTime="2021-03-03 14:00:00", address="9 Pheasant Run, Holmdel, NJ, 07733",\
+    event3 = Event(id=3, name="Event C", date="2021-03-03", address="9 Pheasant Run, Holmdel, NJ, 07733",\
                    description="Event C Description", clubID=2)
     db.session.add(event3)
 

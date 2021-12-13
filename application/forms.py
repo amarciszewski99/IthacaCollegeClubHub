@@ -29,6 +29,7 @@ class RegisterForm(FlaskForm):
 class AddEventForm(FlaskForm):
     name = StringField('Event Title', validators=[DataRequired()])
     club = SelectField('Hosting Club', validators=[DataRequired()])
+    description = StringField('Description', validators=[DataRequired()])
     date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
     location = TextAreaField('Street Address', validators=[DataRequired()])
     submit = SubmitField('Schedule Event')
