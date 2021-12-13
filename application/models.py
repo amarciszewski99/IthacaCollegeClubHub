@@ -35,7 +35,7 @@ class Club(db.Model):
 class Event(db.Model):
 	id = db.Column(db.Integer, primary_key = True)
 	name = db.Column(db.String(128), index = True)
-	dateTime = db.Column(db.String(64), index = True)
+	date = db.Column(db.String(64), index = True)
 	address = db.Column(db.String(128), index = True)
 	description = db.Column(db.String(1024))
 	clubID = db.Column(db.Integer, db.ForeignKey('club.id'))

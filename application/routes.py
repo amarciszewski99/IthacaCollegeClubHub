@@ -78,7 +78,7 @@ def club(name):
             flash("You are already a registered member of this club!")
             return render_template('club.html', title=currentClub.name, club=currentClub, form=form)
 
-    return render_template('club.html', title=currentClub.name, club=currentClub, form=form)
+    return render_template('club.html', title=currentClub.name, club=currentClub, events=events, form=form)
 
 
 @application.route('/event/<name>', methods=['GET', 'POST'])
@@ -141,6 +141,7 @@ def add_club_form():
 @application.route('/add_event', methods=['GET', 'POST'])
 def add_event_form():
     form = AddEventForm()
+    form.club.choices = [(c.id, c.name) for c in Club.query.all()]
     eventList = db.session.query(Event).all()
     for thisEvent in eventList:
         if (thisEvent.name == form.name.data) and (thisEvent.dateTime == form.date_time.data):

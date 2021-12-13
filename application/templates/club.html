@@ -6,4 +6,11 @@
     <h1>{{ club.name }}</h1>
     <br>
     <p>{{ club.description }}</p>
+
+    <h2>Club events:</h2>
+    {% for event in events %}
+        <ul>
+            <li><a href="{{ url_for("event", name=event.name) }}">{{ event.name }}</a></li>
+        </ul>
+    {% endfor %}
 {% endblock %}
