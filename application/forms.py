@@ -41,5 +41,8 @@ class AddClubForm(FlaskForm):
 class JoinClubForm(FlaskForm):
     submit = SubmitField('Join Club')
 
+class LeaveClubForm(FlaskForm):
+    submit = SubmitField('Leave Club')
+
 class JoinEventForm(FlaskForm):
     submit = SubmitField('RSVP')

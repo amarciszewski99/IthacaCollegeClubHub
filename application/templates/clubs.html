@@ -1,8 +1,18 @@
 {% extends "base.html" %}
-
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 {% block app_content %}
-    <h1>Here are all the currently registered Ithaca College student organizations!</h1>
+    <h1>All Clubs</h1>
+    <h4>Here are all the currently registered Ithaca College student organizations!</h4>
     {% for club in club_list %}
-        <div><a href="{{ url_for('club', name=club.name) }}">{{ club.name }}</a></div>
+        <div>
+            <div class="card" style="width: 18rem; background-color: rgba(0,0,255,0.3); padding: 5px;
+            border-style: solid; border-color: black; float: left;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ club.name }}</h5>
+                    <p class="card-text">{{ club.description }}</p>
+                    <a href="{{ url_for('club', name=club.name) }}" class="btn btm-primary">View Details</a>
+                </div>
+            </div>
+        </div>
     {% endfor %}
 {% endblock %}

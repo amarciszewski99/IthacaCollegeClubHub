@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from application import application, db
-from application.forms import LoginForm, RegisterForm, AddClubForm, AddEventForm, JoinClubForm, JoinEventForm
+from application.forms import LoginForm, RegisterForm, AddClubForm, AddEventForm, JoinClubForm, LeaveClubForm, JoinEventForm
 from application.models import Member, Club, Event, MemberToClub, MemberToEvent
 import requests, json, pprint
 
@@ -63,20 +63,29 @@ def clubs():
 @application.route('/club/<name>', methods=['GET', 'POST'])
 @login_required
 def club(name):
-    form = JoinClubForm()
-
     currentClub = Club.query.filter_by(name=name).first()
     isMember = MemberToClub.query.filter_by(memberID=current_user.id, clubID=currentClub.id).first()
 
-    if form.validate_on_submit():
-        if isMember is None:
-            clubMember = MemberToClub(memberID=current_user.id, clubID=currentClub.id)
-            db.session.add(clubMember)
+    if isMember is None:
+        form = JoinClubForm()
+        if form.validate_on_submit():
+            if isMember is None:
+                clubMember = MemberToClub(memberID=current_user.id, clubID=currentClub.id)
+                db.session.add(clubMember)
+                db.session.commit()
+                return redirect(url_for('home'))
+            else:
+                flash("You are already a registered member of this club!")
+                return render_template('club.html', title=currentClub.name, club=currentClub, form=form)
+    else:
+        form = LeaveClubForm()
+        if form.validate_on_submit():
+            clubMember = MemberToClub.query.filter_by(memberID=current_user.id, clubID=currentClub.id).first()
+            db.session.delete(clubMember)
             db.session.commit()
             return redirect(url_for('home'))
-        else:
-            flash("You are already a registered member of this club!")
-            return render_template('club.html', title=currentClub.name, club=currentClub, form=form)
+
+    events = Event.query.filter_by(clubID=currentClub.id).all()
 
     return render_template('club.html', title=currentClub.name, club=currentClub, events=events, form=form)
 
